@@ -1,7 +1,5 @@
 // CRUD + AsyncStorage hooks for notes
-// export function useNotes() {
-//   return {} as any;
-// }
+
 import { useEffect, useState } from "react";
 import { Note } from "@/types";
 import { getNotes, saveNotes } from "@/services/storage";
