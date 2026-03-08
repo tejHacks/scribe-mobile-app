@@ -48,3 +48,105 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Christian Notes App
+
+- Notes
+- Daily Verse
+- Dark Mode
+- Quiz Side or Slide
+- Export Notes [Sync and Sahre via]
+
+📝 Notes
+
+Create, edit, delete, and pin notes
+Tags: Prayer, Sermon, Devotion, Study, Gratitude, and more
+Search and filter by tag from the sidebar
+Copy individual notes to clipboard
+
+📖 Daily Verse
+
+A different Bible verse every day (auto-rotates by date)
+AI "Inspire Me" button — fetches a fresh, personalized verse with a 2-sentence reflection via Claude
+One-click to save an AI verse directly as a new note
+
+🌙 Dark Mode
+
+Toggle between a warm parchment light theme and a deep dark theme
+
+🧠 Bible Quiz
+
+Slides in from the right — 8 random questions per session
+Instant feedback on right/wrong, progress bar, and final score with encouraging message
+
+📤 Export
+
+## Workflow
+
+npx expo install zustand @react-native-async-storage/async-storage
+npx expo install expo-sharing expo-file-system # for Export feature
+npx expo install @expo-google-fonts/playfair-display @expo-google-fonts/lora
+
+## Installed the above Libraries
+
+npx expo install zustand @react-native-async-storage/async-storage
+npx expo install expo-sharing expo-file-system
+npx expo install @expo-google-fonts/playfair-display @expo-google-fonts/lora
+
+## Folder structre
+
+app/
+├── index.tsx # Redirects to (tabs)/notes
+├── \_layout.tsx # Root layout (fonts, theme)
+│
+├── (tabs)/
+│ ├── \_layout.tsx # Tab bar (Notes, Verse, Quiz)
+│ ├── notes.tsx # Notes list screen
+│ ├── verse.tsx # Daily Verse screen
+│ └── quiz.tsx # Bible Quiz screen
+│
+└── note/
+└── [id].tsx # Create / Edit note screen
+
+components/
+├── notes/
+│ ├── NoteCard.tsx
+│ ├── NoteEditor.tsx
+│ └── TagChip.tsx
+│
+├── verse/
+│ └── VerseCard.tsx
+│
+├── quiz/
+│ ├── QuizQuestion.tsx
+│ ├── QuizOption.tsx
+│ └── QuizResult.tsx
+│
+└── ui/
+├── SearchBar.tsx
+├── IconButton.tsx
+└── EmptyState.tsx
+
+hooks/
+├── useNotes.ts # CRUD + AsyncStorage
+├── useDailyVerse.ts # Pick verse by day index
+├── useQuiz.ts # Quiz state
+└── useTheme.ts # Dark/light toggle
+
+constants/
+├── verses.ts # ← All scriptures, static TS file
+├── quiz.ts # ← All quiz questions, static TS file
+└── tags.ts # Tag list
+
+store/
+└── notesStore.ts # Zustand + AsyncStorage persistence
+
+services/
+└── storage.ts # AsyncStorage read/write helpers
+
+types/
+└── index.ts # Note, Verse, QuizQuestion interfaces
+
+assets/
+├── fonts/
+└── images/
