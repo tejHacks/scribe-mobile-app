@@ -7,8 +7,8 @@ export interface Note {
   body: string;
   tags: string[];
   pinned: boolean;
-  createAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 export interface Verse {}
 export interface QuizQuestion {}
