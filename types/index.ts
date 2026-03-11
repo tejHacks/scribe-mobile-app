@@ -10,5 +10,15 @@ export interface Note {
   createdAt: string;
   updatedAt: string;
 }
-export interface Verse {}
-export interface QuizQuestion {}
+export interface Verse {
+  book: string;
+  chapter: number;
+  verse: number;
+  text: string;
+}
+export interface QuizQuestion {
+  q: string;
+  options: string[];
+  answer: number;
+  category: string;
+}

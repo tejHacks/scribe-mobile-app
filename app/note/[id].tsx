@@ -15,6 +15,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { TAGS } from "@/constants/tags";
 import { useNotes } from "@/hooks/useNotes";
+import ScripturePicker from "@/components/notes/ScripturePicker";
 
 export default function NoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -27,8 +28,8 @@ export default function NoteScreen() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [pickerVisible, setPickerVisible] = useState(false);
 
-  // populate fields when existing note loads
   useEffect(() => {
     if (existing) {
       setTitle(existing.title);
@@ -41,6 +42,10 @@ export default function NoteScreen() {
     setTags((prev) =>
       prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t],
     );
+  };
+
+  const handleInsertScripture = (text: string) => {
+    setBody((prev) => prev + (prev ? "\n\n" : "") + text);
   };
 
   const handleSave = async () => {
@@ -94,6 +99,13 @@ export default function NoteScreen() {
               <Ionicons name="trash-outline" size={22} color="#c0392b" />
             </TouchableOpacity>
           )}
+          <TouchableOpacity
+            onPress={() => setPickerVisible(true)}
+            style={styles.scriptureBtn}
+          >
+            <Ionicons name="book-outline" size={15} color="#8b5e1a" />
+            <Text style={styles.scriptureTxt}>Scripture</Text>
+          </TouchableOpacity>
           <TouchableOpacity onPress={handleSave} style={styles.saveBtn}>
             <Text style={styles.saveTxt}>Save</Text>
           </TouchableOpacity>
@@ -110,7 +122,7 @@ export default function NoteScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Title input */}
+          {/* Title */}
           <TextInput
             style={styles.titleInput}
             placeholder="Note title..."
@@ -120,7 +132,7 @@ export default function NoteScreen() {
             multiline
           />
 
-          {/* Tag selector */}
+          {/* Tags */}
           <View style={styles.tagSection}>
             <Text style={styles.tagLabel}>Tags</Text>
             <View style={styles.tagRow}>
@@ -143,7 +155,7 @@ export default function NoteScreen() {
 
           <View style={styles.divider} />
 
-          {/* Body input */}
+          {/* Body */}
           <TextInput
             style={styles.bodyInput}
             placeholder="Write your thoughts, prayers, sermon notes..."
@@ -156,6 +168,13 @@ export default function NoteScreen() {
           />
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Scripture Picker Modal */}
+      <ScripturePicker
+        visible={pickerVisible}
+        onClose={() => setPickerVisible(false)}
+        onInsert={handleInsertScripture}
+      />
     </SafeAreaView>
   );
 }
@@ -179,7 +198,28 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#2c2416",
   },
-  toolRight: { flexDirection: "row", alignItems: "center", gap: 10 },
+  toolRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  scriptureBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1,
+    borderColor: "#e8dcc8",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    backgroundColor: "#fdf0d5",
+  },
+  scriptureTxt: {
+    fontSize: 12,
+    color: "#8b5e1a",
+    fontFamily: "Lora_400Regular",
+    fontWeight: "600",
+  },
   saveBtn: {
     backgroundColor: "#8b5e1a",
     borderRadius: 8,
