@@ -1,48 +1,47 @@
-name: Expo Android Build
+name: Expo Android Build (Free Cloud)
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch: # Manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci # or yarn install --frozen-lockfile if you use yarn
+        run: npm ci # change to yarn install --frozen-lockfile if you use yarn
 
-      - name: Install Expo CLI
-        run: npm install -g expo-cli eas-cli
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
 
-      - name: Build Expo Android (Preview/Debug)
+      - name: Build Expo Android Preview (APK)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas build --platform android --profile preview --non-interactive --no-wait
 
-      # For production/release AAB (uncomment when ready, uses different profile)
-      # - name: Build Expo Android Release
-      #   if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+      # Optional: Add this block later for release builds (on tags or manual)
+      # - name: Build Expo Android Production (AAB)
+      #   if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
       #   env:
       #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      #   run: eas build --platform android --profile production --non-interactive
+      #   run: eas build --platform android --profile production --non-interactive --no-wait
 
-      - name: Upload Artifacts (if build succeeds)
+      - name: Upload build artifacts (if any local outputs)
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: expo-build-artifacts
+          name: expo-build-logs
           path: |
-            **/*.apk
-            **/*.aab
+            **/eas-build-*.json
           retention-days: 7
