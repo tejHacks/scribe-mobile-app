@@ -1,59 +1,59 @@
-name: Build React Native Android
+name: CI
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "LICENSE"
+      - "docs/**"
+      - "examples/**"
   pull_request:
-    branches: [main, master, develop]
-  workflow_dispatch:   # ← lets you run it manually from GitHub UI
+    branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "LICENSE"
+      - "docs/**"
+      - "examples/**"
 
 jobs:
-  build-android:
-    runs-on: ubuntu-latest   # fastest + cheapest for Android builds
+  lint-and-test:
+    name: Lint, Type-check & Test (webapp)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webapp
 
     steps:
-      - name: 🛎️ Checkout code
+      - name: 🏗 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Node.js
+      - name: 🏗 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20   # or 18 / 22 — whatever your project uses
+          node-version: "22"
+          cache: "yarn"
+          cache-dependency-path: webapp/yarn.lock
 
-      - name: 📦 Install dependencies (yarn)
+      - name: 📦 Install dependencies
         run: yarn install --frozen-lockfile
-        # if you use npm → change to: npm ci
 
-      - name: 🔨 Build Android debug APK
-        run: |
-          cd android
-          ./gradlew assembleDebug --stacktrace
-        # For release debug-style: use assembleRelease (but needs signing)
+      - name: 🔷 TypeScript type-check
+        run: yarn type-check
 
-      - name: 📤 Upload APK artifact
+      - name: 🧹 ESLint
+        run: yarn lint
+
+      - name: 🎨 Prettier format check
+        run: yarn prettier:check
+
+      - name: 🧪 Run tests with coverage
+        run: yarn test --coverage --ci
+
+      - name: 📊 Upload coverage report
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: app-debug.apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: coverage-report
+          path: webapp/coverage/
           retention-days: 7
-
-      # ────────────────────────────────────────────────
-      # Uncomment below when you're ready for signed AAB (production)
-      # ────────────────────────────────────────────────
-      # - name: 🔐 Decode Keystore
-      #   run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > my-release-key.jks
-      #
-      # - name: ✍️ Build signed AAB (release)
-      #   env:
-      #     KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-      #     KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-      #     KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      #   run: |
-      #     cd android
-      #     ./gradlew bundleRelease
-      #
-      # - name: 📤 Upload AAB artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: app-release.aab
-      #     path: android/app/build/outputs/bundle/release/app-release.aab
