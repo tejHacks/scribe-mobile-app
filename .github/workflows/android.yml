@@ -1,0 +1,59 @@
+name: Build React Native Android
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:   # ← lets you run it manually from GitHub UI
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest   # fastest + cheapest for Android builds
+
+    steps:
+      - name: 🛎️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20   # or 18 / 22 — whatever your project uses
+
+      - name: 📦 Install dependencies (yarn)
+        run: yarn install --frozen-lockfile
+        # if you use npm → change to: npm ci
+
+      - name: 🔨 Build Android debug APK
+        run: |
+          cd android
+          ./gradlew assembleDebug --stacktrace
+        # For release debug-style: use assembleRelease (but needs signing)
+
+      - name: 📤 Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
+      # ────────────────────────────────────────────────
+      # Uncomment below when you're ready for signed AAB (production)
+      # ────────────────────────────────────────────────
+      # - name: 🔐 Decode Keystore
+      #   run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > my-release-key.jks
+      #
+      # - name: ✍️ Build signed AAB (release)
+      #   env:
+      #     KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      #     KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      #     KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      #   run: |
+      #     cd android
+      #     ./gradlew bundleRelease
+      #
+      # - name: 📤 Upload AAB artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: app-release.aab
+      #     path: android/app/build/outputs/bundle/release/app-release.aab
