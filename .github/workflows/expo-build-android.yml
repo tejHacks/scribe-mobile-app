@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true # Opt-in to Node 24, kills deprecation spam
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,31 +19,34 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20 # Keep 20 for now; change to 22 if needed later
 
       - name: Install dependencies
-        run: npm ci # change to yarn install --frozen-lockfile if you use yarn
+        run: npm ci # or yarn if you use it
 
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
+      - name: EAS whoami (debug auth)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas whoami || echo "Auth check failed - check token"
+
+      - name: Validate EAS config (debug)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas config --platform android --profile preview
+
       - name: Build Expo Android Preview (APK)
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform android --profile preview --non-interactive --no-wait
+        run: eas build --platform android --profile preview --non-interactive --no-wait --clear-cache --json
 
-      # Optional: Add this block later for release builds (on tags or manual)
-      # - name: Build Expo Android Production (AAB)
-      #   if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
-      #   env:
-      #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-      #   run: eas build --platform android --profile production --non-interactive --no-wait
-
-      - name: Upload build artifacts (if any local outputs)
-        if: success()
+      # Artifacts step optional - EAS doesn't output file here, but logs build ID
+      - name: Upload logs if any
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: expo-build-logs
-          path: |
-            **/eas-build-*.json
-          retention-days: 7
+          name: eas-logs
+          path: ./*.json
+          retention-days: 1
