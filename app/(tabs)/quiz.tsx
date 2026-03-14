@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -96,8 +96,8 @@ export default function QuizScreen() {
           </TouchableOpacity>
 
           <Text style={styles.verse}>
-            "Your word is a lamp for my feet, a light on my path." {"\n"}— Psalm
-            119:105
+            &quot;Your word is a lamp for my feet, a light on my path.&quot;{" "}
+            {"\n"}— Psalm 119:105
           </Text>
         </ScrollView>
       </SafeAreaView>

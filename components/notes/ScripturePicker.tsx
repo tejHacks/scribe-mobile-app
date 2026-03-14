@@ -145,13 +145,14 @@ export default function ScripturePicker({ visible, onClose, onInsert }: Props) {
               <View style={styles.emptyWrap}>
                 <Text style={styles.emptyIcon}>📖</Text>
                 <Text style={styles.emptyTxt}>
-                  Search by keyword, book name, or reference like &quot;John 3"
+                  Search by keyword, book name, or reference like &quot;John
+                  3&quot;
                 </Text>
               </View>
             ) : searchResults.length === 0 ? (
               <View style={styles.emptyWrap}>
                 <Text style={styles.emptyTxt}>
-                  No verses found for "{query}"
+                  No verses found for &quot;{query}&quot;
                 </Text>
               </View>
             ) : (

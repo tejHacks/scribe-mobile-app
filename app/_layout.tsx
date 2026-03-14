@@ -31,9 +31,9 @@ export default function RootLayout() {
       <View style={styles.splashContainer}>
         <Text style={styles.title}>Scribe</Text>
         <Text style={styles.verse}>
-          Habakkuk 2:1{`\n`}I will stand at my watch and station myself on the
-          ramparts; I will look to see what he will say to me, and what answer I
-          am to give to this complaint.
+          Habakkuk 2:2{`\n`}Then the Lord answered me and said: “Write the
+          vision And make it plain on tablets, That he may run who reads
+          it.&quot;
         </Text>
       </View>
     );
