@@ -1,0 +1,48 @@
+name: Expo Android Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # Manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci # or yarn install --frozen-lockfile if you use yarn
+
+      - name: Install Expo CLI
+        run: npm install -g expo-cli eas-cli
+
+      - name: Build Expo Android (Preview/Debug)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build --platform android --profile preview --non-interactive --no-wait
+
+      # For production/release AAB (uncomment when ready, uses different profile)
+      # - name: Build Expo Android Release
+      #   if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+      #   env:
+      #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      #   run: eas build --platform android --profile production --non-interactive
+
+      - name: Upload Artifacts (if build succeeds)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: expo-build-artifacts
+          path: |
+            **/*.apk
+            **/*.aab
+          retention-days: 7
